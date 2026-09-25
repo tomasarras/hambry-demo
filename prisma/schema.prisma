@@ -1,0 +1,96 @@
+// Hambry — fictional multi-restaurant food delivery marketplace demo (portfolio project).
+// Prices are stored as whole-peso Int (not Decimal), same convention as vestra-demo:
+// ARS has no meaningful cents in casual display, and Int keeps the schema portable if
+// local dev ever needs a connector without Decimal support (e.g. SQLite).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model Restaurant {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  cuisine     String
+  description String?
+  deliveryFee Int            @default(0)
+  etaMinutes  Int            @default(30)
+  rating      Float          @default(4.5)
+  isOpen      Boolean        @default(true)
+  categories  MenuCategory[]
+  items       MenuItem[]
+  orders      Order[]
+  createdAt   DateTime       @default(now())
+}
+
+model MenuCategory {
+  id           String     @id @default(cuid())
+  name         String
+  order        Int        @default(0)
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  items        MenuItem[]
+}
+
+model MenuItem {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  price        Int
+  available    Boolean       @default(true)
+  restaurantId String
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categoryId   String?
+  category     MenuCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems   OrderItem[]
+  createdAt    DateTime      @default(now())
+}
+
+// RECEIVED   — el cliente acaba de hacer el pedido, el restaurante todavía no lo vio.
+// CONFIRMED  — el restaurante lo aceptó y lo va a preparar.
+// PREPARING  — se está cocinando.
+// ON_THE_WAY — un repartidor lo retiró y lo está llevando.
+// DELIVERED  — entregado.
+// CANCELLED  — el restaurante lo rechazó/canceló (solo posible desde RECEIVED o CONFIRMED).
+enum OrderStatus {
+  RECEIVED
+  CONFIRMED
+  PREPARING
+  ON_THE_WAY
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  items        OrderItem[]
+  status       OrderStatus @default(RECEIVED)
+  customerName String
+  address      String
+  phone        String?
+  notes        String?
+  subtotal     Int
+  deliveryFee  Int
+  total        Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  itemName   String
+  unitPrice  Int
+  quantity   Int
+}
