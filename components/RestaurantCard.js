@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Star, Clock, Bike } from "lucide-react";
-import CuisineIcon from "@/components/CuisineIcon";
+import FoodImage from "@/components/FoodImage";
+import { restaurantImageSrc } from "@/lib/images";
 import { formatCurrency } from "@/lib/format";
 
 export default function RestaurantCard({ restaurant }) {
@@ -14,7 +15,12 @@ export default function RestaurantCard({ restaurant }) {
       }`}
     >
       <div className="relative h-32 w-full">
-        <CuisineIcon cuisine={restaurant.cuisine} className="h-full w-full" />
+        <FoodImage
+          src={restaurantImageSrc(restaurant.slug)}
+          alt={restaurant.name}
+          cuisine={restaurant.cuisine}
+          className="h-full w-full"
+        />
         {closed && (
           <span className="absolute right-2 top-2 rounded-full bg-black/80 px-2.5 py-1 text-xs font-semibold text-white">
             Cerrado

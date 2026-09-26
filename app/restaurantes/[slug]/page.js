@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Star, Clock, Bike } from "lucide-react";
 import StoreHeader from "@/components/StoreHeader";
-import CuisineIcon from "@/components/CuisineIcon";
+import FoodImage from "@/components/FoodImage";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { formatCurrency } from "@/lib/format";
+import { restaurantImageSrc } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,12 @@ export default async function RestaurantPage({ params }) {
       <StoreHeader />
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="flex items-center gap-4">
-          <CuisineIcon cuisine={restaurant.cuisine} className="h-20 w-20 shrink-0 rounded-2xl" />
+          <FoodImage
+            src={restaurantImageSrc(restaurant.slug)}
+            alt={restaurant.name}
+            cuisine={restaurant.cuisine}
+            className="h-20 w-20 shrink-0 rounded-2xl"
+          />
           <div>
             <h1 className="text-2xl font-bold">{restaurant.name}</h1>
             <p className="text-sm text-black/50">{restaurant.cuisine}</p>

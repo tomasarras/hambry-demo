@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/components/CartProvider";
+import FoodImage from "@/components/FoodImage";
+import { menuItemImageSrc } from "@/lib/images";
 import { formatCurrency } from "@/lib/format";
 
 export default function RestaurantMenu({ restaurant, categories }) {
@@ -63,6 +65,12 @@ export default function RestaurantMenu({ restaurant, categories }) {
               const qty = qtyInCart(item.id);
               return (
                 <li key={item.id} className="flex items-center justify-between gap-4 p-4">
+                  <FoodImage
+                    src={menuItemImageSrc(restaurant.slug, item.name)}
+                    alt={item.name}
+                    cuisine={restaurant.cuisine}
+                    className="h-16 w-16 shrink-0 rounded-xl"
+                  />
                   <div className="min-w-0 flex-1">
                     <p className={`font-medium ${!item.available ? "text-black/40" : ""}`}>{item.name}</p>
                     {item.description && <p className="mt-0.5 text-sm text-black/50">{item.description}</p>}

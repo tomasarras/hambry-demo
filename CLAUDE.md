@@ -2,8 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-@AGENTS.md
-
 Hambry is a fictional multi-restaurant food delivery marketplace demo (portfolio project): Next.js App Router (JS, not TS) + Prisma/PostgreSQL (Neon), Tailwind v4. Same stack and conventions as the sibling `vestra-demo`/`comanda-demo` repos, adapted for a marketplace instead of a single store.
 
 ## Commands
@@ -37,7 +35,7 @@ There's no server-side check re-validating any of this on the API routes — sam
 
 **Data model** (`prisma/schema.prisma`): `Restaurant → MenuCategory → MenuItem`, `Restaurant → Order → OrderItem`. `OrderItem` snapshots `itemName`/`unitPrice` at purchase time so a later menu edit doesn't corrupt past (simulated) order history. Money is a plain `Int` (whole ARS pesos), not Prisma `Decimal` — same rationale as `vestra-demo`. There is deliberately no `Customer`/`User` model: "my orders" (`/mis-pedidos`) is just a list of order ids the browser created, kept in `localStorage` (`lib/myOrders.js`), not a real account.
 
-**No images anywhere.** There's no seeded stock photography and no upload flow (no Vercel Blob dependency, unlike `vestra-demo`/`comanda-demo`) — every restaurant/menu-item placeholder renders a cuisine-appropriate `lucide-react` icon on a cuisine-colored background instead (`lib/cuisineStyle.js` + `components/CuisineIcon.js`). This was a deliberate scope cut to avoid the extra Blob-store provisioning step during deploy.
+**Images are static, not uploaded.** There's still no upload flow (no Vercel Blob dependency, unlike `vestra-demo`/`comanda-demo`) — restaurants and menu items from the fixed demo catalog (`lib/demoData.mjs`) have pre-generated photos committed under `public/images/{restaurants,items}/<slug>.jpg`, keyed by `slugify()`'d name (`lib/images.js`). `components/FoodImage.js` renders that photo and falls back to the cuisine-colored `lucide-react` icon (`lib/cuisineStyle.js` + `components/CuisineIcon.js`) when no file exists for the slug — e.g. any item created later through the admin panel, which still has no way to attach a photo.
 
 **Route inventory**: Public storefront — `/inicio` (restaurant list, `?cocina=`/`?q=` filters), `/restaurantes/[slug]` (menu, add to cart), `/carrito` (cart + checkout form, posts to `/api/orders`), `/pedido/[id]` (tracking), `/mis-pedidos` (history) — all render `StoreHeader`. Restaurant admin — `/restaurante/ingresar` (pick restaurant), then the `(panel)` group: `/restaurante` (dashboard/counts), `/restaurante/pedidos` (order queue + status actions), `/restaurante/menu` (+ `/nuevo`, `/[id]` using the shared `components/MenuItemForm.js`), `/restaurante/categorias`. Courier — `/repartidor` (cross-restaurant ready/in-progress board). `app/api/<resource>/route.js` (+ `[id]/route.js`) are plain Route Handlers returning `{ error }` + a status code on failure.
 

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Store } from "lucide-react";
-import CuisineIcon from "@/components/CuisineIcon";
+import FoodImage from "@/components/FoodImage";
+import { restaurantImageSrc } from "@/lib/images";
 import { useRestaurantAdmin } from "@/components/RestaurantAdminProvider";
 
 // No real login: this is just "which restaurant am I" for the demo, since
@@ -52,7 +53,12 @@ export default function IngresarPage() {
                 onClick={() => handleSelect(r)}
                 className="flex w-full items-center gap-3 rounded-2xl border border-black/10 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <CuisineIcon cuisine={r.cuisine} className="h-12 w-12 shrink-0 rounded-xl" />
+                <FoodImage
+                  src={restaurantImageSrc(r.slug)}
+                  alt={r.name}
+                  cuisine={r.cuisine}
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                />
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{r.name}</p>
                   <p className="text-sm text-black/50">{r.cuisine}</p>
